@@ -25,7 +25,7 @@ public class FacultyController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Faculty>> getAllFacultyColor(@RequestParam(required = false) String color) {
+    public ResponseEntity<List<Faculty>> getAllFacultyColor(@RequestParam(value = "color",required = false) String color) {
         List<Faculty> faculties = facultyService.getAllFacultyColor(color);
         if (faculties.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -48,11 +48,8 @@ public class FacultyController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Faculty> deleteFaculty(@PathVariable Long id) {
-        Faculty faculty = facultyService.deleteFaculty(id);
-        if (faculty == null) {
-            return ResponseEntity.badRequest().build();
-        }
-        return ResponseEntity.ok(faculty);
+    public ResponseEntity deleteFaculty(@PathVariable Long id) {
+        facultyService.deleteFaculty(id);
+        return ResponseEntity.ok().build();
     }
 }

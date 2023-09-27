@@ -1,14 +1,22 @@
 package ru.hogwarts.school.model;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import java.util.Objects;
 
+@Entity
 public class Faculty {
-    private Long id;
+    @Id
+    @GeneratedValue
+    private long id;
+
     private String name;
     private String color;
 
-    public Faculty(Long id, String name, String color) {
-        this.id = id;
+    public Faculty() {
+    }
+    public Faculty(String name, String color) {
         this.name = name;
         this.color = color;
     }
@@ -44,14 +52,14 @@ public class Faculty {
 
         Faculty faculty = (Faculty) o;
 
-        if (!Objects.equals(id, faculty.id)) return false;
+        if (id != faculty.id) return false;
         if (!Objects.equals(name, faculty.name)) return false;
         return Objects.equals(color, faculty.color);
     }
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
+        int result = (int) (id ^ (id >>> 32));
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (color != null ? color.hashCode() : 0);
         return result;

@@ -18,7 +18,7 @@ public class StudentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Student>> getAllStudentAge(@RequestParam("age") int age) {
+    public ResponseEntity<List<Student>> getAllStudentAge(@RequestParam(value = "age",required = false) int age) {
         List<Student> allStudentAge = service.getAllStudentAge(age);
         if (allStudentAge.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -49,7 +49,8 @@ public class StudentController {
     }
 
     @DeleteMapping("{id}")
-    public Student deleteStudent(@PathVariable Long id) {
-        return service.deleteStudent(id);
+    public ResponseEntity deleteStudent(@PathVariable Long id) {
+        service.deleteStudent(id);
+        return ResponseEntity.ok().build();
     }
 }
