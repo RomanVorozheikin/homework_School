@@ -3,8 +3,10 @@ package ru.hogwarts.school.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.FacultyService;
 
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -15,6 +17,13 @@ public class FacultyController {
     public FacultyController(FacultyService facultyService) {
         this.facultyService = facultyService;
     }
+
+    @GetMapping("students-by-faculty-id")
+    public Collection<Student> getStudentByFacultyId(@RequestParam Long id) {
+        return facultyService.getStudentByFacultyId(id);
+    }
+
+
     @GetMapping("{id}")
     public ResponseEntity<Faculty> getFacultyInfo(@PathVariable Long id) {
         Faculty faculty = facultyService.findFaculty(id);
@@ -24,6 +33,15 @@ public class FacultyController {
         return ResponseEntity.ok(faculty);
     }
 
+    @GetMapping("find-name-by-color")
+    public ResponseEntity<List<Faculty>> findFacultyNameOrColor(@RequestParam(required = false) String name,
+                                                                @RequestParam(required = false) String color) {
+        List<Faculty> faculties = facultyService.findFacultyNameOrColor(name, color);
+        if (faculties.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(faculties);
+    }
     @GetMapping
     public ResponseEntity<List<Faculty>> getAllFacultyColor(@RequestParam(value = "color",required = false) String color) {
         List<Faculty> faculties = facultyService.getAllFacultyColor(color);

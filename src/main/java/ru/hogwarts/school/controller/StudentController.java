@@ -3,9 +3,11 @@ package ru.hogwarts.school.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.StudentService;
 
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -17,8 +19,13 @@ public class StudentController {
         this.service = service;
     }
 
+    @GetMapping("faculty-by-student-id")
+    public Faculty getFacultyByStudentId(@RequestParam Long id) {
+        return service.getFacultyByStudentId(id);
+    }
+
     @GetMapping
-    public ResponseEntity<List<Student>> getAllStudentAge(@RequestParam(value = "age",required = false) int age) {
+    public ResponseEntity<List<Student>> getAllStudentAge(@RequestParam(value = "age", required = false) int age) {
         List<Student> allStudentAge = service.getAllStudentAge(age);
         if (allStudentAge.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -32,6 +39,16 @@ public class StudentController {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok(student);
+    }
+
+    @GetMapping("minMax")
+    public ResponseEntity<Collection<Student>> getStudentBetweenMinMax(@RequestParam int min,
+                                                                       @RequestParam int max) {
+        Collection<Student> students = service.getStudentBetweenMinMax(min, max);
+        if (students.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(students);
     }
 
     @PostMapping
