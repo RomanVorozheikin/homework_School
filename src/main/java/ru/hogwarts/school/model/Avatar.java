@@ -1,32 +1,29 @@
 package ru.hogwarts.school.model;
 
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
+
+import static javax.persistence.GenerationType.IDENTITY;
 
 
 @Entity
 public class Avatar {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
     private String filePath;
     private long fileSize;
     private String mediaType;
     @Lob
+    @Type(type="org.hibernate.type.BinaryType")
     private byte[] data;
 
     @OneToOne
     private Student student;
 
     public Avatar() {
-    }
-
-    public Avatar(Long id, String filePath, long fileSize, String mediaType, Student student) {
-        this.id = id;
-        this.filePath = filePath;
-        this.fileSize = fileSize;
-        this.mediaType = mediaType;
-        this.student = student;
     }
 
     public Long getId() {

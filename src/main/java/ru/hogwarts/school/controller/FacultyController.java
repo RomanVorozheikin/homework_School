@@ -34,8 +34,8 @@ public class FacultyController {
     }
 
     @GetMapping("find-name-by-color")
-    public ResponseEntity<List<Faculty>> findFacultyNameOrColor(@RequestParam(required = false) String name,
-                                                                @RequestParam(required = false) String color) {
+    public ResponseEntity<List<Faculty>> findFacultyNameOrColor(@RequestParam String name,
+                                                                @RequestParam String color) {
         List<Faculty> faculties = facultyService.findFacultyNameOrColor(name, color);
         if (faculties.isEmpty()) {
             return ResponseEntity.badRequest().build();

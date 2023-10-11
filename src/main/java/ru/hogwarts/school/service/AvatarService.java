@@ -9,6 +9,7 @@ import ru.hogwarts.school.repository.AvatarRepository;
 import ru.hogwarts.school.repository.StudentRepository;
 
 import javax.imageio.ImageIO;
+import javax.transaction.Transactional;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -20,17 +21,16 @@ import static java.nio.file.StandardOpenOption.CREATE_NEW;
 @Service
 public class AvatarService {
 
-    @Value("${path.to.avatars.folder}")
-    private String avatarDir;
-    
+    private final String avatarDir;
     private final AvatarRepository avatarRepository;
-    private final StudentService studentService;
     private final StudentRepository studentRepository;
 
-    public AvatarService(StudentService studentService, AvatarRepository avatarRepository, StudentRepository studentRepository) {
+    public AvatarService(AvatarRepository avatarRepository,
+                         StudentRepository studentRepository,
+                         @Value("${path.to.avatars.folder}") String avatarDir) {
         this.avatarRepository = avatarRepository;
-        this.studentService = studentService;
         this.studentRepository = studentRepository;
+        this.avatarDir = avatarDir;
     }
 
     public void uploadAvatar(Long studentId,
