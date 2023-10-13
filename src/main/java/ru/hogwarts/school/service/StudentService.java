@@ -22,7 +22,7 @@ public class StudentService {
         return studentRepository.findByFacultyId(facultyId);
     }
     public Faculty getFacultyByStudentId(Long id) {
-        return studentRepository.findById(id).get().getFaculty();
+        return studentRepository.findStudentById(id).get().getFaculty();
     }
     public Collection<Student> getStudents() {
         return studentRepository.findAll();

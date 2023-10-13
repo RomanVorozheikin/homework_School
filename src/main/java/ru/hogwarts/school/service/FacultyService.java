@@ -43,7 +43,7 @@ public class FacultyService {
         return facultyRepository.save(faculty);
     }
 
-    public Faculty findFaculty(long lastId) {
+    public Faculty findFaculty(Long lastId) {
         return facultyRepository.findById(lastId).orElse(null);
     }
 
