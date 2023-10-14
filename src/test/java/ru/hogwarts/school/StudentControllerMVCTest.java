@@ -42,6 +42,11 @@ public class StudentControllerMVCTest {
     @InjectMocks
     private StudentController studentController;
 
+    Student STUDENT_1 = new Student("Gordon", 24, 1L);
+    Student STUDENT_2 = new Student("Bob", 25, 2L);
+
+    Faculty FACULTY_1 = new Faculty("Non", "Red", 1L);
+
     @Test
     public void postGetStudentTest() throws Exception {
         Long id = 1L;
@@ -91,58 +96,50 @@ public class StudentControllerMVCTest {
 
     @Test
     public void testGetAllStudentAge() throws Exception {
-        List<Student> students = new ArrayList<>();
-        students.add(new Student("Bob", 23));
-        students.add(new Student("Jon", 23));
 
-        when(studentService.getAllStudentAge(anyInt())).thenReturn(students);
+        when(studentService.getAllStudentAge(anyInt())).thenReturn(List.of(STUDENT_1));
 
+        int age = 24;
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/student")
-                        .param("age", "23"))
+                        .param("age",String.valueOf(age)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].name", is("Bob")))
-                .andExpect(jsonPath("$[0].age", is(23)))
-                .andExpect(jsonPath("$[1].name", is("Jon")))
-                .andExpect(jsonPath("$[1].age", is(23)));
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].name", is("Gordon")))
+                .andExpect(jsonPath("$[0].age", is(24)));
 
-        verify(studentService).getAllStudentAge(23);
+        verify(studentService).getAllStudentAge(age);
     }
     @Test
     public  void testGetBetweenAge() throws Exception {
-        List<Student> students = new ArrayList<>();
-        students.add(new Student("Bob", 24));
-        students.add(new Student("Jon", 23));
-
         int min = 22;
         int max = 25;
 
-
-        when(studentRepository.findByAgeBetween(min, max)).thenReturn(students);
+        when(studentRepository.findByAgeBetween(min, max)).thenReturn(List.of(STUDENT_1,STUDENT_2));
 
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/student/minMax")
                         .param("min", String.valueOf(min))
                         .param("max", String.valueOf(max)))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(students.size())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(2)));
 
         verify(studentRepository, times(1)).findByAgeBetween(min, max);
     }
 
     @Test
     public void testGetFacultyByStudentId() throws Exception {
-        Faculty faculty = new Faculty();
-        Student student = new Student();
-        student.setFaculty(faculty);
+        STUDENT_1.setFaculty(FACULTY_1);
 
-        when(studentRepository.findStudentById(anyLong())).thenReturn(Optional.of(student));
+        when(studentRepository.findStudentById(anyLong())).thenReturn(Optional.of(STUDENT_1));
 
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/student/faculty-by-student-id")
-                        .param("id", "1"))
+                        .param("id", "1")
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(faculty.getId()));
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.name").value(FACULTY_1.getName()))
+                .andExpect(jsonPath("$.color").value(FACULTY_1.getColor()));
     }
 }

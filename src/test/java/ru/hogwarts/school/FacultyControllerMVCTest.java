@@ -10,7 +10,6 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.hogwarts.school.controller.FacultyController;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
@@ -20,7 +19,6 @@ import ru.hogwarts.school.service.FacultyService;
 import ru.hogwarts.school.service.StudentService;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,7 +38,7 @@ public class FacultyControllerMVCTest {
     private FacultyRepository facultyRepository;
     @MockBean
     private StudentRepository studentRepository;
-    @MockBean
+    @SpyBean
     private StudentService studentService;
     @SpyBean
     private FacultyService facultyService;
@@ -48,6 +46,13 @@ public class FacultyControllerMVCTest {
     @InjectMocks
     private FacultyController facultyController;
 
+    Student STUDENT_1 = new Student("Gordon", 24, 1L);
+    Student STUDENT_2 = new Student("Bob", 25, 2L);
+    Student STUDENT_3 = new Student("Jon", 26, 3L);
+
+    Faculty FACULTY_1 = new Faculty("Non", "Red", 1L);
+    Faculty FACULTY_2 = new Faculty("Stop", "White", 2L);
+    Faculty FACULTY_3 = new Faculty("Weed", "Green", 3L);
     @Test
     public void testPostGetFaculty() throws Exception {
         Long id = 1L;
@@ -89,65 +94,54 @@ public class FacultyControllerMVCTest {
 
     @Test
     public void testGetFacultyColor() throws Exception {
-        List<Faculty> faculties = new ArrayList<>();
-        faculties.add(new Faculty("wer", "red"));
-        faculties.add(new Faculty("sad", "red"));
-
-        String color = "red";
-        when(facultyService.getAllFacultyColor(anyString())).thenReturn(faculties);
+        String color = "Red";
+        when(facultyService.getAllFacultyColor(anyString())).thenReturn(List.of(FACULTY_1));
 
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/faculty")
                         .param("color", color))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(faculties.size())))
-                .andExpect(jsonPath("$[0].name").value("wer"))
-                .andExpect(jsonPath("$[0].color").value("red"))
-                .andExpect(jsonPath("$[1].name").value("sad"))
-                .andExpect(jsonPath("$[1].color").value("red"));
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].name").value("Non"))
+                .andExpect(jsonPath("$[0].color").value("Red"));
         verify(facultyService).getAllFacultyColor(color);
     }
 
     @Test
     public void testGetStudentsByFaculty() throws Exception {
-        Student student0 = new Student("bob", 22);
-        Student student1 = new Student("jon", 23);
+        STUDENT_1.setFaculty(FACULTY_1);
+        STUDENT_2.setFaculty(FACULTY_1);
 
-        student0.setFaculty(new Faculty());
-        student1.setFaculty(new Faculty());
+        List<Student> STUDENTS = new ArrayList<>(List.of(STUDENT_1, STUDENT_2));
 
-        Collection<Student> students = new ArrayList<>();
-        students.add(student0);
-        students.add(student1);
+        when(studentRepository.findByFacultyId(anyLong())).thenReturn(STUDENTS);
 
         Long id = 1L;
-        when(studentRepository.findByFacultyId(anyLong())).thenReturn(students);
-
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/faculty/students-by-faculty-id")
-                        .param("id", String.valueOf(id)))
+                        .param("id", String.valueOf(id))
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$",hasSize(students.size())))
-                .andExpect(jsonPath("$[0].faculty").value(student0.getFaculty()))
-                .andExpect(jsonPath("$[1].faculty").value(student1.getFaculty()));
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].faculty.id").value(STUDENT_1.getFaculty().getId()))
+                .andExpect(jsonPath("$[1].faculty.name").value(STUDENT_2.getFaculty().getName()));
     }
     @Test
     public void testGetFacultyByNameColor() throws Exception {
-        List<Faculty> faculties = new ArrayList<>();
-        faculties.add(new Faculty("123", "qwe"));
-        faculties.add(new Faculty("var", "js"));
-
-        String color= "red";
-        String name = "wer";
-        when(facultyRepository.findFacultyByColorIgnoreCase(anyString())).thenReturn(faculties);
-        when(facultyRepository.findFacultyByNameIgnoreCase(anyString())).thenReturn(faculties);
+        String color= "White";
+        String name = "Non";
+        when(facultyRepository.findFacultyByColorIgnoreCase(anyString())).thenReturn(List.of(FACULTY_1));
+        when(facultyRepository.findFacultyByNameIgnoreCase(anyString())).thenReturn(List.of(FACULTY_2));
 
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/faculty/find-name-by-color")
                         .param("name", name)
                         .param("color", color))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(faculties.size() * 2)));
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].name").value(FACULTY_2.getName()))
+                .andExpect(jsonPath("$[1].color").value(FACULTY_1.getColor()));
         verify(facultyRepository, times(1)).findFacultyByColorIgnoreCase(color);
         verify(facultyRepository, times(1)).findFacultyByNameIgnoreCase(name);
     }
