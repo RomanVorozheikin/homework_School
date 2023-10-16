@@ -1,4 +1,4 @@
-package ru.hogwarts.school;
+package ru.hogwarts.school.controller;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;

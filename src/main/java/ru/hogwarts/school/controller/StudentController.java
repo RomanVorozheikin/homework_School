@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.model.StudentLastFive;
 import ru.hogwarts.school.service.StudentService;
 
 import java.util.Collection;
@@ -32,6 +33,7 @@ public class StudentController {
         }
         return ResponseEntity.ok(allStudentAge);
     }
+
     @GetMapping("{id}")
     public ResponseEntity<Student> getStudentInfo(@PathVariable Long id) {
         Student student = service.findStudent(id);
@@ -69,5 +71,20 @@ public class StudentController {
     public ResponseEntity deleteStudent(@PathVariable Long id) {
         service.deleteStudent(id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("student-count")
+    public Integer getStudentCount() {
+        return service.getCount();
+    }
+
+    @GetMapping("avg-student")
+    public Double getAvgAge() {
+        return service.getAvgAgeStudent();
+    }
+
+    @GetMapping("student-last-five")
+    public List<StudentLastFive> getLastFives() {
+        return service.getLastFives();
     }
 }

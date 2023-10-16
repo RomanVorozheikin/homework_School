@@ -1,4 +1,4 @@
-package ru.hogwarts.school;
+package ru.hogwarts.school.controller;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -11,13 +11,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import ru.hogwarts.school.controller.StudentController;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.StudentRepository;
 import ru.hogwarts.school.service.StudentService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,6 +76,34 @@ public class StudentControllerMVCTest {
 
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/student/" + id)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id))
+                .andExpect(jsonPath("$.name").value(name))
+                .andExpect(jsonPath("$.age").value(age));
+    }
+    @Test
+    public void testPutStudent() throws Exception {
+        Long id = 1L;
+        String name = "user";
+        int age = 22;
+
+        Student student = new Student();
+        student.setId(id);
+        student.setName(name);
+        student.setAge(age);
+
+        JSONObject studentObject = new JSONObject();
+        studentObject.put("id", id);
+        studentObject.put("name", name);
+        studentObject.put("age", age);
+
+        when(studentRepository.save(student)).thenReturn(student);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .put("/student")
+                        .content(studentObject.toString())
+                        .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id))

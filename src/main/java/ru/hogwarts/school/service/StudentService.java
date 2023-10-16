@@ -2,9 +2,9 @@ package ru.hogwarts.school.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.hogwarts.school.model.Avatar;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.model.StudentLastFive;
 import ru.hogwarts.school.repository.StudentRepository;
 
 import java.util.*;
@@ -54,4 +54,15 @@ public class StudentService {
         studentRepository.deleteById(id);
     }
 
+    public Integer getCount() {
+       return studentRepository.getCountStudent();
+    }
+
+    public Double getAvgAgeStudent() {
+        return studentRepository.getAvgAgeStudent();
+    }
+
+    public List<StudentLastFive> getLastFives() {
+        return studentRepository.getLastFiveStudent();
+    }
 }
