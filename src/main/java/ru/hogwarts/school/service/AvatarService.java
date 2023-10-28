@@ -1,5 +1,7 @@
 package ru.hogwarts.school.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -10,7 +12,6 @@ import ru.hogwarts.school.repository.AvatarRepository;
 import ru.hogwarts.school.repository.StudentRepository;
 
 import javax.imageio.ImageIO;
-import javax.transaction.Transactional;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -27,6 +28,8 @@ public class AvatarService {
     private final AvatarRepository avatarRepository;
     private final StudentRepository studentRepository;
 
+    Logger logger = LoggerFactory.getLogger(AvatarService.class);
+
     public AvatarService(AvatarRepository avatarRepository,
                          StudentRepository studentRepository,
                          @Value("${path.to.avatars.folder}") String avatarDir) {
@@ -37,6 +40,7 @@ public class AvatarService {
 
     public void uploadAvatar(Long studentId,
                              MultipartFile avatarFile) throws IOException {
+        logger.info("A method was called to save the avatar for DB");
         Student student = studentRepository.getById(studentId);
 
         Path filePath = Path.of(avatarDir, studentId + "." + getExtensions(avatarFile.getOriginalFilename()));
@@ -62,6 +66,7 @@ public class AvatarService {
     }
 
     private byte[] generateImagePreview(Path filePath)throws IOException {
+        logger.info("The method for saving a small copy of the avatar is called");
         try (
                 InputStream is = Files.newInputStream(filePath);
                 BufferedInputStream bis = new BufferedInputStream(is,1024);
@@ -80,15 +85,18 @@ public class AvatarService {
     }
 
     public List<Avatar> getAllAvatarStudentPage(Integer numberPage, Integer numberSize) {
-        PageRequest pageRequest = PageRequest.of(numberPage-1, numberSize);
+        logger.info("The method for displaying avatars by page is called");
+        PageRequest pageRequest = PageRequest.of(numberPage - 1, numberSize);
         return avatarRepository.findAll(pageRequest).getContent();
     }
 
     private String getExtensions(String stringFileName) {
+        logger.info("Called method to get file extension");
         return stringFileName.substring(stringFileName.lastIndexOf(".") + 1);
     }
 
     public Avatar findAvatar(Long studentId) {
+        logger.info("Called method for getting avatar");
         return avatarRepository.findByStudentId(studentId).orElse(new Avatar());
     }
 

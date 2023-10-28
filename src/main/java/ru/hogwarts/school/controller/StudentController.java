@@ -1,5 +1,7 @@
 package ru.hogwarts.school.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,7 @@ import java.util.List;
 public class StudentController {
     private final StudentService service;
 
+    Logger logger = LoggerFactory.getLogger(StudentController.class);
     public StudentController(StudentService service) {
         this.service = service;
     }
@@ -29,6 +32,7 @@ public class StudentController {
     public ResponseEntity<List<Student>> getAllStudentAge(@RequestParam(value = "age", required = false) int age) {
         List<Student> allStudentAge = service.getAllStudentAge(age);
         if (allStudentAge.isEmpty()) {
+            logger.error("There are no employees of this age");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         return ResponseEntity.ok(allStudentAge);
@@ -38,6 +42,7 @@ public class StudentController {
     public ResponseEntity<Student> getStudentInfo(@PathVariable Long id) {
         Student student = service.findStudent(id);
         if (student == null) {
+            logger.error("There is not student with id"+id);
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok(student);
@@ -48,6 +53,7 @@ public class StudentController {
                                                                        @RequestParam int max) {
         Collection<Student> students = service.getStudentBetweenMinMax(min, max);
         if (students.isEmpty()) {
+            logger.error("There are no employees in this age range");
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok(students);
@@ -62,6 +68,7 @@ public class StudentController {
     public ResponseEntity<Student> updateStudent(@RequestBody Student student) {
         Student s = service.updateStudent(student);
         if (s == null) {
+            logger.error("There is no such student"+s);
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok(s);
