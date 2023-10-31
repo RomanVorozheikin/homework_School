@@ -17,7 +17,7 @@ public class FacultyService {
     private final FacultyRepository facultyRepository;
     private final StudentService studentService;
 
-    Logger logger = LoggerFactory.getLogger(FacultyService.class);
+    private final Logger logger = LoggerFactory.getLogger(FacultyService.class);
     @Autowired
     public FacultyService(FacultyRepository facultyRepository, StudentService studentService) {
         this.facultyRepository = facultyRepository;
@@ -65,5 +65,13 @@ public class FacultyService {
     public void deleteFaculty(long id) {
         logger.debug("A method was called to remove a faculty");
         facultyRepository.deleteById(id);
+    }
+
+    public String longestFacultyName() {
+        logger.info("Method called longestFacultyName");
+        return facultyRepository.findAll()
+                .stream()
+                .max((f1, f2) -> f1.getName().length() - f2.getName().length())
+                .toString();
     }
 }

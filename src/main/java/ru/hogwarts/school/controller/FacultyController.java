@@ -16,7 +16,6 @@ import java.util.List;
 public class FacultyController {
     private final FacultyService facultyService;
 
-    Logger logger = LoggerFactory.getLogger(FacultyController.class);
     public FacultyController(FacultyService facultyService) {
         this.facultyService = facultyService;
     }
@@ -31,7 +30,6 @@ public class FacultyController {
     public ResponseEntity<Faculty> getFacultyInfo(@PathVariable Long id) {
         Faculty faculty = facultyService.findFaculty(id);
         if (faculty == null) {
-            logger.error("There is no such faculty"+faculty);
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(faculty);
@@ -42,16 +40,15 @@ public class FacultyController {
                                                                 @RequestParam String color) {
         List<Faculty> faculties = facultyService.findFacultyNameOrColor(name, color);
         if (faculties.isEmpty()) {
-            logger.error("No results found for this color or faculty name");
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok(faculties);
     }
+
     @GetMapping
-    public ResponseEntity<List<Faculty>> getAllFacultyColor(@RequestParam(value = "color",required = false) String color) {
+    public ResponseEntity<List<Faculty>> getAllFacultyColor(@RequestParam(value = "color", required = false) String color) {
         List<Faculty> faculties = facultyService.getAllFacultyColor(color);
         if (faculties.isEmpty()) {
-            logger.error("No faculties found for this color");
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(faculties);
@@ -66,7 +63,6 @@ public class FacultyController {
     public ResponseEntity<Faculty> updateFaculty(@RequestBody Faculty faculty) {
         Faculty f = facultyService.updateFaculty(faculty);
         if (f == null) {
-            logger.error("There is no such faculty"+f);
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(f);
@@ -76,5 +72,10 @@ public class FacultyController {
     public ResponseEntity deleteFaculty(@PathVariable Long id) {
         facultyService.deleteFaculty(id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("long-faculty-name")
+    public String longestFacultyName() {
+        return facultyService.longestFacultyName();
     }
 }

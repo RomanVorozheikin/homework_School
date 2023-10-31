@@ -11,10 +11,11 @@ import ru.hogwarts.school.repository.StudentRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class StudentService {
-    Logger logger = LoggerFactory.getLogger(StudentService.class);
+    private final Logger logger = LoggerFactory.getLogger(StudentService.class);
     private final StudentRepository studentRepository;
 
     @Autowired
@@ -79,5 +80,32 @@ public class StudentService {
     public List<StudentLastFive> getLastFives() {
         logger.info("Was invoked method for last five students");
         return studentRepository.getLastFiveStudent();
+    }
+
+    public Collection<String> startsWithA() {
+        logger.info("Method called startsWithA");
+        return studentRepository
+                .findAll()
+                .stream()
+                .filter(s->s.getName().startsWith("A"))
+                .map(s->s.getName().toUpperCase())
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
+    public Double getAvgAgeStudentStream() {
+        logger.info("Method called getAvgAgeStudentStream");
+        return studentRepository.findAll()
+                .stream()
+                .mapToInt(Student::getAge)
+                .average()
+                .orElse(0.0);
+    }
+
+    public Integer sumTask4() {
+        return Stream.iterate(1, a -> a + 1)
+                .limit(1_000_000)
+                .parallel()
+                .reduce(0, Integer::sum);
     }
 }
