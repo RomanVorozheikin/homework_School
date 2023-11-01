@@ -108,4 +108,42 @@ public class StudentService {
                 .parallel()
                 .reduce(0, Integer::sum);
     }
+
+    public void taskStreamsStudent_1() {
+
+        getNameStudentList(0);
+        getNameStudentList(1);
+
+        new Thread(() -> {
+            getNameStudentList(2);
+            getNameStudentList(3);
+        }).start();
+
+        new Thread(() -> {
+            getNameStudentList(4);
+            getNameStudentList(5);
+        }).start();
+
+    }
+
+    private void getNameStudentList(int number) {
+        List<Student> students = studentRepository.findAll();
+        System.out.println(students.get(number).getName());
+    }
+
+    public synchronized void taskStreamsStudent_2() {
+
+        getNameStudentList(0);
+        getNameStudentList(1);
+
+        new Thread(() -> {
+            getNameStudentList(2);
+            getNameStudentList(3);
+        }).start();
+
+        new Thread(() -> {
+            getNameStudentList(4);
+            getNameStudentList(5);
+        }).start();
+    }
 }

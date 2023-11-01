@@ -105,4 +105,13 @@ public class StudentController {
     public Integer sumTask4() {
         return service.sumTask4();
     }
+
+    @GetMapping("streams-parallel-student-task-1")
+    public void taskStreamsStudent_1() {
+        service.taskStreamsStudent_1();
+    }
+    @GetMapping("streams-parallel-student-task-2")
+    public void taskStreamsStudent_2() {
+        service.taskStreamsStudent_2();
+    }
 }
